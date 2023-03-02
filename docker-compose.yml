@@ -6,4 +6,4 @@ services:
     ports:
       - 27017:27017
     env_file:
-      - ./config/mongo.env
+      - ./env/mongo.env
