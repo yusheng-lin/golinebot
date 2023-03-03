@@ -16,6 +16,24 @@ info:
   title: Gin swagger
   version: "1.0"
 paths:
+  /linebot/{lineuserId}/message:
+    get:
+      parameters:
+      - description: lineuserId
+        in: path
+        name: lineuserId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: uers login
+      tags:
+      - linebot
   /linebot/message:
     post:
       parameters:

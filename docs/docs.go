@@ -48,6 +48,34 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/linebot/{lineuserId}/message": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "linebot"
+                ],
+                "summary": "uers login",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "lineuserId",
+                        "name": "lineuserId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {

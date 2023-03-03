@@ -1,3 +1,5 @@
+all:
+	mongo run
 mongo:
 	docker-compose up -d
 build:

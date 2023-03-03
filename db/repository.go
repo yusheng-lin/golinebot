@@ -19,7 +19,7 @@ func NewRepository(db *mongo.Client) *Repository {
 	}
 }
 
-func (repo *Repository) AddMessage(msg *model.Receive) error {
+func (repo *Repository) AddMessage(msg *model.Message) error {
 	bson, _ := toDoc(msg)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -30,11 +30,47 @@ func (repo *Repository) AddMessage(msg *model.Receive) error {
 	return nil
 }
 
+func (repo *Repository) GetMessages(lineuserId string) (*[]model.Message, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	cur, err := repo.db.Database("linedb").Collection("messages").Find(ctx, bson.D{{Key: "lineuserid", Value: lineuserId}})
+	defer cur.Close(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	messages := []model.Message{}
+
+	for cur.Next(ctx) {
+		var result bson.D
+		err := cur.Decode(&result)
+		if err != nil {
+			return nil, err
+		}
+		doc, err := bson.Marshal(result)
+		var m model.Message
+		err = bson.Unmarshal(doc, &m)
+		messages = append(messages, m)
+	}
+
+	return &messages, nil
+}
+
 func toDoc(v interface{}) (doc *bson.D, err error) {
 	data, err := bson.Marshal(v)
 	if err != nil {
 		return
 	}
 	err = bson.Unmarshal(data, &doc)
+	return
+}
+
+func toModel(doc *bson.D) (data interface{}, err error) {
+	b, err := bson.Marshal(doc)
+	if err != nil {
+		return
+	}
+	err = bson.Unmarshal(b, &data)
 	return
 }

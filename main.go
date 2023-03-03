@@ -22,7 +22,6 @@ func main() {
 		log.Error().Err(err)
 		return
 	}
-	log.Print("app start")
 	server.SetupRouter()
 	server.Run(8080)
 }

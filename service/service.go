@@ -24,7 +24,7 @@ func NewService(repo *db.Repository) *Service {
 	}
 }
 
-func (svc *Service) AddMsg(msg *model.Receive) error {
+func (svc *Service) AddMsg(msg *model.Message) error {
 	err := svc.repo.AddMessage(msg)
 
 	if err != nil {
@@ -32,4 +32,14 @@ func (svc *Service) AddMsg(msg *model.Receive) error {
 		return err
 	}
 	return nil
+}
+
+func (svc *Service) GetMessages(lineuserId string) (*[]model.Message, error) {
+	msgs, err := svc.repo.GetMessages(lineuserId)
+
+	if err != nil {
+		log.Error().Stack().Err(err).Msg("")
+		return nil, err
+	}
+	return msgs, nil
 }

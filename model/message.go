@@ -2,7 +2,7 @@ package model
 
 import "time"
 
-type Receive struct {
+type Message struct {
 	Text       string
 	Time       time.Time
 	LineUserId string

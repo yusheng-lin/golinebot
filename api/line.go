@@ -64,8 +64,27 @@ func (ctrl *LineController) PushMsg(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "success")
 }
 
-func parseMessage(event *linebot.Event) *model.Receive {
-	return &model.Receive{
+// @Summary uers login
+// @Tags linebot
+// @version 1.0
+// @produce application/json
+// @param lineuserId path string true "lineuserId"
+// @Success 200 string string 成功後返回的值
+// @Router /linebot/{lineuserId}/message [get]
+func (ctrl *LineController) Messages(ctx *gin.Context) {
+	lineuserId := ctx.Param("lineuserId")
+	msgs, err := ctrl.svc.GetMessages(lineuserId)
+
+	if err != nil {
+		log.Error().Err(err).Msg("")
+		ctx.JSON(http.StatusExpectationFailed, "get message fail please try again later")
+		return
+	}
+	ctx.JSON(http.StatusOK, msgs)
+}
+
+func parseMessage(event *linebot.Event) *model.Message {
+	return &model.Message{
 		LineUserId: event.Source.UserID,
 		Text:       event.Message.(*linebot.TextMessage).Text,
 		Time:       event.Timestamp,
