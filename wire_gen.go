@@ -7,16 +7,22 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"github.com/google/wire"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"golinebot/api"
 	"golinebot/config"
+	"golinebot/db"
 	"golinebot/service"
+	"time"
 )
 
 // Injectors from wire.go:
 
 func initapp() (*Server, func(), error) {
-	config, err := ConfigProvider()
+	config, err := configProvider()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -24,7 +30,13 @@ func initapp() (*Server, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	lineController := api.NewLineController(client)
+	mongoClient, err := mongodbProvider(config)
+	if err != nil {
+		return nil, nil, err
+	}
+	repository := db.NewRepository(mongoClient)
+	serviceService := service.NewService(repository)
+	lineController := api.NewLineController(client, serviceService)
 	server := NewServer(lineController)
 	return server, func() {
 	}, nil
@@ -34,7 +46,9 @@ func initapp() (*Server, func(), error) {
 
 var cf *config.Config
 
-func ConfigProvider() (*config.Config, error) {
+var mgdb *mongo.Client
+
+func configProvider() (*config.Config, error) {
 	if cf == nil {
 		c, err := config.NewConfig("./env")
 
@@ -46,6 +60,23 @@ func ConfigProvider() (*config.Config, error) {
 	return cf, nil
 }
 
+func mongodbProvider(config2 *config.Config) (*mongo.Client, error) {
+	if mgdb == nil {
+		conn := fmt.Sprintf("mongodb://%s:%s@%s", config2.MongoUser, config2.MongoPwd, config2.MongoURL)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		client, err := mongo.Connect(ctx, options.Client().ApplyURI(conn))
+
+		if err != nil {
+			return nil, err
+		}
+
+		mgdb = client
+	}
+	return mgdb, nil
+}
+
 var providerSet = wire.NewSet(
-	ConfigProvider, service.NewLineBot, api.NewLineController, NewServer,
+	configProvider,
+	mongodbProvider, db.NewRepository, service.NewLineBot, service.NewService, api.NewLineController, NewServer,
 )

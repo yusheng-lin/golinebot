@@ -10,9 +10,10 @@ func main() {
 	server, cleanup, err := initapp()
 	defer cleanup()
 	if err != nil {
-		log.Fatal().Err(err)
+		log.Error().Err(err)
 		return
 	}
+	log.Print("app start")
 	server.SetupRouter()
 	server.Run(8080)
 }

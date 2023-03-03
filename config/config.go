@@ -11,7 +11,6 @@ type Config struct {
 	LineChannelSecret string `mapstructure:"LINE_CHANNEL_SECRET"`
 	LineChannelToken  string `mapstructure:"LINE_CHANNEL_ACCESS_TOKEN"`
 	MongoURL          string `mapstructure:"MONGODB_URL"`
-	MongoDB           string `mapstructure:"MONGODB_NAME"`
 	MongoUser         string `mapstructure:"MONGO_INITDB_ROOT_USERNAME"`
 	MongoPwd          string `mapstructure:"MONGO_INITDB_ROOT_PASSWORD"`
 }

@@ -4,15 +4,22 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"github.com/google/wire"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"golinebot/api"
 	"golinebot/config"
+	"golinebot/db"
 	"golinebot/service"
+	"time"
 )
 
 var cf *config.Config
+var mgdb *mongo.Client
 
-func ConfigProvider() (*config.Config, error) {
+func configProvider() (*config.Config, error) {
 	if cf == nil {
 		c, err := config.NewConfig("./env")
 
@@ -24,9 +31,28 @@ func ConfigProvider() (*config.Config, error) {
 	return cf, nil
 }
 
+func mongodbProvider(config *config.Config) (*mongo.Client, error) {
+	if mgdb == nil {
+		conn := fmt.Sprintf("mongodb://%s:%s@%s", config.MongoUser, config.MongoPwd, config.MongoURL)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		client, err := mongo.Connect(ctx, options.Client().ApplyURI(conn))
+
+		if err != nil {
+			return nil, err
+		}
+
+		mgdb = client
+	}
+	return mgdb, nil
+}
+
 var providerSet = wire.NewSet(
-	ConfigProvider,
+	configProvider,
+	mongodbProvider,
+	db.NewRepository,
 	service.NewLineBot,
+	service.NewService,
 	api.NewLineController,
 	NewServer,
 )
