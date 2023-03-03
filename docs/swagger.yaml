@@ -1,0 +1,38 @@
+definitions:
+  model.Push:
+    properties:
+      lineUserId:
+        type: string
+      text:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Gin swagger
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Gin swagger
+  version: "1.0"
+paths:
+  /linebot/message:
+    post:
+      parameters:
+      - description: msg
+        in: body
+        name: msg
+        required: true
+        schema:
+          $ref: '#/definitions/model.Push'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: uers login
+      tags:
+      - linebot
+swagger: "2.0"

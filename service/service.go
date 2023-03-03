@@ -24,7 +24,7 @@ func NewService(repo *db.Repository) *Service {
 	}
 }
 
-func (svc *Service) AddMsg(msg *model.Message) error {
+func (svc *Service) AddMsg(msg *model.Receive) error {
 	err := svc.repo.AddMessage(msg)
 
 	if err != nil {

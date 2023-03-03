@@ -40,8 +40,32 @@ func (ctrl *LineController) Callback(ctx *gin.Context) {
 	}
 }
 
-func parseMessage(event *linebot.Event) *model.Message {
-	return &model.Message{
+// @Summary uers login
+// @Tags linebot
+// @version 1.0
+// @produce application/json
+// @param msg body model.Push true "msg"
+// @Success 200 string string 成功後返回的值
+// @Router /linebot/message [post]
+func (ctrl *LineController) PushMsg(ctx *gin.Context) {
+	msg := &model.Push{}
+	err := ctx.BindJSON(msg)
+	if err != nil {
+		ctx.JSON(http.StatusOK, "Invalid params")
+		return
+	}
+	_, err = ctrl.linebot.PushMessage(msg.LineUserId, linebot.NewTextMessage(msg.Text)).Do()
+
+	if err != nil {
+		log.Error().Err(err).Msg("")
+		ctx.JSON(http.StatusExpectationFailed, "push message fail please try again later")
+		return
+	}
+	ctx.JSON(http.StatusOK, "success")
+}
+
+func parseMessage(event *linebot.Event) *model.Receive {
+	return &model.Receive{
 		LineUserId: event.Source.UserID,
 		Text:       event.Message.(*linebot.TextMessage).Text,
 		Time:       event.Timestamp,

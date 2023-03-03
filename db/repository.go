@@ -19,7 +19,7 @@ func NewRepository(db *mongo.Client) *Repository {
 	}
 }
 
-func (repo *Repository) AddMessage(msg *model.Message) error {
+func (repo *Repository) AddMessage(msg *model.Receive) error {
 	bson, _ := toDoc(msg)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

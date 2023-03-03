@@ -1,6 +1,6 @@
 mongo:
 	docker-compose up -d
 build:
-	wire .
+	wire .;swag init
 run:
 	go run golinebot
