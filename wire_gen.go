@@ -13,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golinebot/api"
+	"golinebot/bot"
 	"golinebot/config"
 	"golinebot/db"
 	"golinebot/service"
@@ -26,7 +27,7 @@ func initapp() (*Server, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	client, err := service.NewLineBot(config)
+	client, err := bot.NewLineBot(config)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -34,8 +35,8 @@ func initapp() (*Server, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	repository := db.NewRepository(mongoClient)
-	serviceService := service.NewService(repository)
+	iRepository := db.NewRepository(mongoClient)
+	serviceService := service.NewService(iRepository)
 	lineController := api.NewLineController(client, serviceService)
 	server := NewServer(lineController)
 	return server, func() {
@@ -78,5 +79,5 @@ func mongodbProvider(config2 *config.Config) (*mongo.Client, error) {
 
 var providerSet = wire.NewSet(
 	configProvider,
-	mongodbProvider, db.NewRepository, service.NewLineBot, service.NewService, api.NewLineController, NewServer,
+	mongodbProvider, db.NewRepository, bot.NewLineBot, service.NewService, api.NewLineController, NewServer,
 )

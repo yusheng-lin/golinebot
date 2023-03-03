@@ -1,8 +1,6 @@
 definitions:
-  model.Push:
+  model.Text:
     properties:
-      lineUserId:
-        type: string
       text:
         type: string
     type: object
@@ -31,18 +29,22 @@ paths:
           description: OK
           schema:
             type: string
-      summary: uers login
+      summary: fetch messages
       tags:
       - linebot
-  /linebot/message:
     post:
       parameters:
+      - description: lineuserId
+        in: path
+        name: lineuserId
+        required: true
+        type: string
       - description: msg
         in: body
-        name: msg
+        name: text
         required: true
         schema:
-          $ref: '#/definitions/model.Push'
+          $ref: '#/definitions/model.Text'
       produces:
       - application/json
       responses:
@@ -50,7 +52,7 @@ paths:
           description: OK
           schema:
             type: string
-      summary: uers login
+      summary: push message
       tags:
       - linebot
 swagger: "2.0"

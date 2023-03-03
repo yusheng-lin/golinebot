@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"golinebot/model"
+	"golinebot/service"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,10 +14,11 @@ type Repository struct {
 	db *mongo.Client
 }
 
-func NewRepository(db *mongo.Client) *Repository {
-	return &Repository{
+func NewRepository(db *mongo.Client) service.IRepository {
+	var repo service.IRepository = &Repository{
 		db: db,
 	}
+	return repo
 }
 
 func (repo *Repository) AddMessage(msg *model.Message) error {
@@ -63,14 +65,5 @@ func toDoc(v interface{}) (doc *bson.D, err error) {
 		return
 	}
 	err = bson.Unmarshal(data, &doc)
-	return
-}
-
-func toModel(doc *bson.D) (data interface{}, err error) {
-	b, err := bson.Marshal(doc)
-	if err != nil {
-		return
-	}
-	err = bson.Unmarshal(b, &data)
 	return
 }

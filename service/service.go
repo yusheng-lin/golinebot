@@ -1,24 +1,21 @@
 package service
 
 import (
-	"golinebot/config"
-	"golinebot/db"
 	"golinebot/model"
 
 	"github.com/rs/zerolog/log"
-
-	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
 
-func NewLineBot(config *config.Config) (*linebot.Client, error) {
-	return linebot.New(config.LineChannelSecret, config.LineChannelToken)
+type IRepository interface {
+	AddMessage(msg *model.Message) error
+	GetMessages(lineuserId string) (*[]model.Message, error)
 }
 
 type Service struct {
-	repo *db.Repository
+	repo IRepository
 }
 
-func NewService(repo *db.Repository) *Service {
+func NewService(repo IRepository) *Service {
 	return &Service{
 		repo: repo,
 	}

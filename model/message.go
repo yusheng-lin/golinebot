@@ -8,7 +8,6 @@ type Message struct {
 	LineUserId string
 }
 
-type Push struct {
-	Text       string
-	LineUserId string
+type Text struct {
+	Text string
 }

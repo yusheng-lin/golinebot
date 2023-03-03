@@ -19,36 +19,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/linebot/message": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "linebot"
-                ],
-                "summary": "uers login",
-                "parameters": [
-                    {
-                        "description": "msg",
-                        "name": "msg",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.Push"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/linebot/{lineuserId}/message": {
             "get": {
                 "produces": [
@@ -57,7 +27,7 @@ const docTemplate = `{
                 "tags": [
                     "linebot"
                 ],
-                "summary": "uers login",
+                "summary": "fetch messages",
                 "parameters": [
                     {
                         "type": "string",
@@ -75,16 +45,48 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "linebot"
+                ],
+                "summary": "push message",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "lineuserId",
+                        "name": "lineuserId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "msg",
+                        "name": "text",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Text"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
             }
         }
     },
     "definitions": {
-        "model.Push": {
+        "model.Text": {
             "type": "object",
             "properties": {
-                "lineUserId": {
-                    "type": "string"
-                },
                 "text": {
                     "type": "string"
                 }

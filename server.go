@@ -25,7 +25,7 @@ func NewServer(lineCtrl *api.LineController) *Server {
 
 func (server *Server) SetupRouter() {
 	server.router.POST("/api/v1/linebot/callback", server.lineCtrl.Callback)
-	server.router.POST("/api/v1/linebot/message", server.lineCtrl.PushMsg)
+	server.router.POST("/api/v1/linebot/:lineuserId/message", server.lineCtrl.PushMsg)
 	server.router.GET("/api/v1/linebot/:lineuserId/message", server.lineCtrl.Messages)
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	server.router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"golinebot/bot"
 	"golinebot/model"
 	"golinebot/service"
 	"net/http"
@@ -32,39 +33,41 @@ func (ctrl *LineController) Callback(ctx *gin.Context) {
 
 	for _, event := range events {
 		if event.Type == linebot.EventTypeMessage {
-			msg := parseMessage(event)
+			msg := bot.ParseMessage(event)
 			if err := ctrl.svc.AddMsg(msg); err != nil {
-				ctx.JSON(http.StatusExpectationFailed, struct{}{})
+				ctx.JSON(http.StatusInternalServerError, struct{}{})
 			}
 		}
 	}
 }
 
-// @Summary uers login
+// @Summary push message
 // @Tags linebot
 // @version 1.0
 // @produce application/json
-// @param msg body model.Push true "msg"
+// @param lineuserId path string true "lineuserId"
+// @param text body model.Text true "msg"
 // @Success 200 string string 成功後返回的值
-// @Router /linebot/message [post]
+// @Router /linebot/{lineuserId}/message [post]
 func (ctrl *LineController) PushMsg(ctx *gin.Context) {
-	msg := &model.Push{}
+	lineuserId := ctx.Param("lineuserId")
+	msg := &model.Text{}
 	err := ctx.BindJSON(msg)
 	if err != nil {
 		ctx.JSON(http.StatusOK, "Invalid params")
 		return
 	}
-	_, err = ctrl.linebot.PushMessage(msg.LineUserId, linebot.NewTextMessage(msg.Text)).Do()
+	_, err = ctrl.linebot.PushMessage(lineuserId, linebot.NewTextMessage(msg.Text)).Do()
 
 	if err != nil {
 		log.Error().Err(err).Msg("")
-		ctx.JSON(http.StatusExpectationFailed, "push message fail please try again later")
+		ctx.JSON(http.StatusInternalServerError, "push message fail please try again later")
 		return
 	}
 	ctx.JSON(http.StatusOK, "success")
 }
 
-// @Summary uers login
+// @Summary fetch messages
 // @Tags linebot
 // @version 1.0
 // @produce application/json
@@ -77,16 +80,8 @@ func (ctrl *LineController) Messages(ctx *gin.Context) {
 
 	if err != nil {
 		log.Error().Err(err).Msg("")
-		ctx.JSON(http.StatusExpectationFailed, "get message fail please try again later")
+		ctx.JSON(http.StatusInternalServerError, "fetch message fail please try again later")
 		return
 	}
 	ctx.JSON(http.StatusOK, msgs)
-}
-
-func parseMessage(event *linebot.Event) *model.Message {
-	return &model.Message{
-		LineUserId: event.Source.UserID,
-		Text:       event.Message.(*linebot.TextMessage).Text,
-		Time:       event.Timestamp,
-	}
 }

@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golinebot/api"
+	"golinebot/bot"
 	"golinebot/config"
 	"golinebot/db"
 	"golinebot/service"
@@ -51,7 +52,7 @@ var providerSet = wire.NewSet(
 	configProvider,
 	mongodbProvider,
 	db.NewRepository,
-	service.NewLineBot,
+	bot.NewLineBot,
 	service.NewService,
 	api.NewLineController,
 	NewServer,
